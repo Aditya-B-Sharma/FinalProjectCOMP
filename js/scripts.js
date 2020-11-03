@@ -5,8 +5,17 @@ function initMap() {
     center: { lat: -35.2777, lng: 149.1185},
     zoom: 16,
   });
+  google.maps.event.addListener(map, 'click', function(event) {
+    placeMarker(event.latLng);
+  });
 }
 
+function placeMarker(location) {
+   var marker = new google.maps.Marker({
+       position: location, 
+       map: map
+   });
+}
 // var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
 // var mapOptions = {
 //   zoom: 4,
