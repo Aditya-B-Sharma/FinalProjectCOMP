@@ -12,7 +12,7 @@ function initMap() {
 
 function placeMarker(location) {
    var marker = new google.maps.Marker({
-       position: location, 
+       position: location,
        map: map
    });
 }
