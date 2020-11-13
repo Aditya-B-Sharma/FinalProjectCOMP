@@ -1,45 +1,39 @@
 let map;
-let startmarker;
-let endmarker;
-let markers = [];
+var markers = [];
 
 let startlistener;
 let endlistener;
 let normlistener;
 
-let latlong = [];
-let start;
-let end;
-
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: -35.2777, lng: 149.1185},
+    center: { lat: -35.2777, lng: 149.1185 },
     zoom: 16,
   });
 
 }
 
 async function placeMarker(location, type) {
-   if (type == "start"){
-     console.log("start");
-     var smarker = new google.maps.Marker({
+  if (type == "start") {
+    console.log("start");
+    var smarker = new google.maps.Marker({
       position: location,
       map: map,
     });
     smarker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue-dot.png');
-    startmarker = smarker;
+    markers.push(smarker);
     return;
-   }
-   if (type == "end"){
+  }
+  if (type == "end") {
     console.log("end");
     var emarker = new google.maps.Marker({
       position: location,
       map: map,
     });
     emarker.setIcon('https://maps.google.com/mapfiles/ms/icons/green-dot.png');
-    endmarker = emarker;
+    markers.push(emarker);
     return;
-   } else {
+  } else if (type == "norm") {
     console.log("norm");
     var marker = new google.maps.Marker({
       position: location,
@@ -48,45 +42,100 @@ async function placeMarker(location, type) {
     marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red-dot.png');
     markers.push(marker);
     return;
-   }
+  }
 }
 
-function shortestpath(){
+function shortestpath() {
   // ask user to input 2 points
   // startpoint();
   // need to clear markers here -> clicking djikstras
+  clearMarkers();
   startnode();
-  setTimeout(() => {  endnode(); }, 1000);
-  setTimeout(() => {  normnode(); }, 1500);
   // remove norm lsitener when done
-  
+
   // ask user to input all inbetween points
   // get hull points
 }
 
-function startnode(){
-  startlistener = google.maps.event.addListener(map, 'click', function(event) {
+function startnode() {
+  startlistener = google.maps.event.addListener(map, 'click', function (event) {
     console.log("reached start");
     placeMarker(event.latLng, "start");
     google.maps.event.removeListener(startlistener);
+    endnode();
   });
 }
 
-function endnode(){
+function endnode() {
   console.log("reached end");
-  endlistener = google.maps.event.addListener(map, 'click', function(event) {
+  endlistener = google.maps.event.addListener(map, 'click', function (event) {
     placeMarker(event.latLng, "end");
     google.maps.event.removeListener(endlistener);
+    normnode();
   });
 }
 
-function normnode(){
+function normnode() {
   console.log("reached norm");
-  normlistener = google.maps.event.addListener(map, 'click', function(event) {
+  normlistener = google.maps.event.addListener(map, 'click', function (event) {
     placeMarker(event.latLng, "norm");
   });
 }
 
+
+
+function setMapOnAll(map) {
+  for (let i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+  markers = [];
+}
+
+function clearMarkers() {
+  setMapOnAll(null);
+}
+
+
+
+function distances() {
+  let out = [];
+  let list = [];
+  let graph = [];
+  for (let a = 0; a < graph.length; a++){
+    graph[a].splice(0, graph[a].length);
+    graph[a] = 0;
+  }
+  if (markers != null) {
+    // from source to all other markers (we assume all nodes are accessible)
+    // for (let i = 0; i < markers.length; i++) {
+    //   list.push(google.maps.geometry.spherical.computeDistanceBetween(startmarker.getPosition(), markers[i].getPosition()));
+    // }
+    // graph.push(list);
+    // list = [];
+    for (let j = 0; j < markers.length; j++) {
+      let list = [];
+      for (let k = 0; k < markers.length; k++) {
+        list.push(google.maps.geometry.spherical.computeDistanceBetween(markers[j].getPosition(), markers[k].getPosition()));
+      }
+      graph.push(list);
+      delete list;
+    }
+  }
+  for (let y = 0; y < graph.length; y ++) {
+    let output = "";
+    for (let y1 = 0; y1 < graph[y].length; y1 ++) {
+      output+=(graph[y][y1] + ", ");
+    }
+    out.push(output);
+  }
+  console.log(graph);
+  delete graph;
+  console.log(out);
+  
+}
+
+function djikstras() {
+}
 
 // var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
 // var mapOptions = {
