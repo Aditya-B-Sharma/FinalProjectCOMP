@@ -7,6 +7,10 @@ let startlistener;
 let endlistener;
 let normlistener;
 
+let latlong = [];
+let start;
+let end;
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: -35.2777, lng: 149.1185},
@@ -50,9 +54,11 @@ async function placeMarker(location, type) {
 function shortestpath(){
   // ask user to input 2 points
   // startpoint();
+  // need to clear markers here -> clicking djikstras
   startnode();
   setTimeout(() => {  endnode(); }, 1000);
-  setTimeout(() => {  normnode(); }, 2000);
+  setTimeout(() => {  normnode(); }, 1500);
+  // remove norm lsitener when done
   
   // ask user to input all inbetween points
   // get hull points
@@ -80,6 +86,8 @@ function normnode(){
     placeMarker(event.latLng, "norm");
   });
 }
+
+
 // var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
 // var mapOptions = {
 //   zoom: 4,
